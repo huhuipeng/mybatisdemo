@@ -50,7 +50,7 @@ public class UserController {
         for(User userlist:users){
             System.out.println(userlist.getTeacher().getTname());
         }
-        System.out.println(222);
+        System.out.println(22222);
         return users;
     }
 }
