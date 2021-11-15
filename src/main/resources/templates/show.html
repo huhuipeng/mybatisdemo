@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <script src="./js/jquery.js"></script>
+</head>
+<body>
+<form class="form-inline" action="/demo/showlist2">
+    <div class="form-group">
+        <label for="exampleInputName2" >Name</label>
+        <input type="text" class="form-control" id="exampleInputName2" name="username">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputEmail2" >Email</label>
+        <input type="text" class="form-control" id="exampleInputEmail2" name="password">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputEmail2">Email</label>
+        <input type="email" class="form-control" id="exampleInputEmail3">
+    </div>
+    <input type="submit" class="btn btn-default">Send invitation</input>
+</form>
+    <div style="float: right">
+        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#addModal">添加</a>
+    </div>
+<table class="table table-hover table-bordered">
+    <tr>
+        <td>ID</td>
+        <td>用户名</td>
+        <td>密码</td>
+        <td>老师编号</td>
+    </tr>
+    <tr th:each="user:${alluser.list}">
+        <td><span th:text="${user.getId()}"></span></td>
+        <td><span th:text="${user.getUsername()}"></span></td>
+        <td><span th:text="${user.getPassword()}"></span></td>
+        <td><span th:text="${user.getTeacherid()}"></span></td>
+        <td><a th:href="'./deleteuser?id='+${user.getId()}" class="btn btn-default" th:text="删除" ></a>&nbsp;
+            <button class="btn btn-default deldata" th:text="修改" data-toggle="modal" data-target="#myModal" th:name="${user.id}"></button></td>
+    </tr>
+</table>
+<div th:each="page:${alluser}">
+    一共有[[${page.getPages()}]]页<span th:text="${page.getTotal()}"></span>条记录,当前第[[${page.getPageNum()}]]页<br>
+    <a href="./showlist?p=1" th:if="${not page.isFirstPage}">首页</a>
+    <a th:href="'./showlist?p='+${page.prePage}" th:if="${ page.isFirstPage}==false">上一页</a>
+    <a th:href="'./showlist?p='+${page.nextPage}" th:if="${ page.isLastPage}==false">下一页</a>
+    <a th:href="'./showlist?p='+${page.pages}" th:if="${not page.isLastPage}">尾页</a>
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">修改</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/demo/updateuser">
+                   <input type="hidden" name="id" class="form-control"  id="id" ><br>
+                    用户名<input type="text" name="username" class="form-control"  id="username"><br>
+                    密码<input type="text" name="password" class="form-control"  id="password"><br>
+                    老师id<input type="text" name="teacherid" class="form-control"  id="teacherid">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <input type="submit" class="btn btn-primary"></input>
+                    </div>
+
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<script>
+    $(".deldata").click(function () {
+        //根据ID查询出名称和备注，放到文本框
+
+        $.ajax({
+            data:{"id":$(this).attr("name")},
+            url: "/demo/selectbyid/",
+            type: "get",
+            dataType: "json",
+            success: function (res) {
+                $("#id").val(res.id);
+                $("#username").val(res.username);
+                $("#password").val(res.password);
+                $("#teacherid").val(res.teacherid);
+            }
+        })
+    })
+
+</script>
+<!--添加模态框-->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="addModalLabel">添加</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/demo/adduser">
+                    用户名<input type="text" name="username" class="form-control"><br>
+                    密码<input type="text" name="password" class="form-control"><br>
+                    老师id<input type="text" name="teacherid" class="form-control">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <input type="submit" class="btn btn-primary"></input>
+                    </div>
+                </form>
+            </div>
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+<!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+<script src="js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatisdemo.repository.UserRepository">
+    <select id="findAll" resultType="User">
+        select * from User
+    </select>
+
+    <insert id="insertuser">
+        insert into User(username,password,teacherid) values(#{username},#{password},#{teacherid})
+<!--            <selectKey resultType="Integer" keyProperty="id" order="AFTER">-->
+<!--        select last_insert_id()-->
+<!--            </selectKey>-->
+    </insert>
+
+    <update id="updateuser">
+        update User set username=#{username},password=#{password},teacherid=#{teacherid} where id=#{id}
+    </update>
+
+    <delete id="deleteuser">
+        delete from User where id=#{id}
+    </delete>
+
+    <select id="seleteById" resultType="User">
+        select * from User where teacherid=#{id}
+    </select>
+
+    <select id="selectNameById" resultType="String" parameterType="Integer">
+        select username from User where id=#{id}
+    </select>
+
+<!--    关联查询-->
+    <resultMap id="rmUser" type="com.example.mybatisdemo.entity.User">
+        <id column="id" property="id"></id>
+        <result column="teacherid" property="teacherid"></result>
+        <association property="teacher" select="com.example.mybatisdemo.repository.TeacherRepository.selectById"
+                     column="teacherid">
+        </association>
+    </resultMap>
+    <select id="ManytoOne" resultMap="rmUser">
+        select * from User limit 0,7
+    </select>
+
+    <select id="selectByUserid" resultType="user">
+        select * from user where id=#{id}
+    </select>
+
+    <select id="dynaticselect" parameterType="java.util.Map" resultType="user">
+        select * from user
+        <where>
+            <if test="username!=null">
+                and username like "%"#{username}"%"
+            </if>
+            <if test="password!=null">
+                and password like concat('%', #{password}, '%')
+            </if>
+        </where>
+    </select>
+
+</mapper>
